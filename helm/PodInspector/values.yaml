@@ -1,0 +1,9 @@
+image:
+  repository: "docker.io/library/podinspector"
+  tag: "latest"
+  pullPolicy: IfNotPresent
+overrideNamespace: "monitoring"
+
+service:
+  type: ClusterIP
+  port: 8080

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-service
+  namespace: {{ .Values.overrideNamespace | default .Release.Namespace | quote }}
+spec:
+  type: {{ .Values.service.type | default "ClusterIP" }}
+  selector:
+    app.kubernetes.io/name: pod-inspector
+  ports:
+    - protocol: TCP
+      port: {{ .Values.service.port | default 8080 }}
+      targetPort: {{ .Values.service.targetPort | default .Values.service.port | default 8080 }}
+      {{- if .Values.service.nodePort -}}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end -}}
