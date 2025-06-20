@@ -19,3 +19,4 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.service.port | default 8080 }}
+      serviceAccountName: {{ .Release.Name }}-service-account
