@@ -19,4 +19,21 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.service.port | default 8080 }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.service.port | default 8080 }}
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: {{ .Values.service.port | default 8080 }}    
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 2
+            failureThreshold: 3
+            successThreshold: 1
       serviceAccountName: {{ .Release.Name }}-service-account
