@@ -68,6 +68,11 @@ clusterMetrics:
   # @ignored
   collector: alloy-metrics
 
+  # Disable RootFsMount for k8s cluster in WSL2
+  node-exporter:
+    hostRootFsMount:
+      enabled: false
+
   # To see additional options, please see the [Cluster Monitoring feature documentation](https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring/charts/feature-cluster-metrics).
 
 # -- Cluster events.
@@ -365,8 +370,3 @@ extraObjects: []
 #     dataFrom:
 #     - extract:
 #         key: mysecret
-
-# prometheus-node-exporter:
-#   enabled: true
-#   hostRootFsMount:
-#     enabled: false
