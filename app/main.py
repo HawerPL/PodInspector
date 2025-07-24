@@ -7,12 +7,13 @@ from app.core.logging_config import init_logging
 from app.services.kube_client import init_kube_client
 
 
+
 init_logging()
 app = FastAPI(title="PodInspector", version="1.0")
+Instrumentator().instrument(app).expose(app)
 
 app.include_router(router)
 
-Instrumentator().instrument(app).expose(app)
 
 #TODO: Zaktualizować do lifespan
 @app.on_event("startup")

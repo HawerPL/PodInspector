@@ -7,3 +7,6 @@ overrideNamespace: "monitoring"
 service:
   type: ClusterIP
   port: 8080
+
+podAnnotations:
+  k8s.grafana.com/scrape: true

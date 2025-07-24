@@ -12,6 +12,12 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: pod-inspector
+      annotations:
+      {{- with .Values.podAnnotations }}
+      {{- range $key, $value := . }}
+        {{ $key }}: {{ tpl $value $ | quote }}
+      {{- end }}
+      {{- end }}
     spec:
       containers:
         - name: podinspector
