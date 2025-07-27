@@ -1,5 +1,5 @@
 image:
-  repository: "docker.io/library/podinspector"
+  repository: "registry.hawer.eu/podinspector"
   tag: "latest"
   pullPolicy: IfNotPresent
 overrideNamespace: "monitoring"
@@ -9,4 +9,4 @@ service:
   port: 8080
 
 podAnnotations:
-  k8s.grafana.com/scrape: true
+  k8s.grafana.com/scrape: 'true'

@@ -42,4 +42,7 @@ spec:
             timeoutSeconds: 2
             failureThreshold: 3
             successThreshold: 1
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-configmap
       serviceAccountName: {{ .Release.Name }}-service-account

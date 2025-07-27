@@ -3,3 +3,4 @@ pydantic~=2.11.7
 kubernetes~=33.1.0
 uvicorn~=0.34.3
 prometheus-fastapi-instrumentator~=7.1.0
+pyroscope-io~=0.8.11

@@ -43,6 +43,11 @@ grafana:
               datasourceUid: prom
             serviceMap:
               datasourceUid: prom
+        - name: Grafana Pyroscope
+          type: grafana-pyroscope-datasource
+          url: http://k8s-monitoring-alloy-receiver:4040
+          jsonData:
+            minStep: '15s'
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1
@@ -55,6 +60,275 @@ grafana:
           editable: true
           options:
             path: /var/lib/grafana/dashboards/default
+  # kubectl create secret generic lgtm-distributed-grafana-smtp-secret --from-literal=user='alert@example.com' --from-literal=password='your-password' -n default
+  smtp:
+    existingSecret: "lgtm-distributed-grafana-smtp-secret"
+    userKey: user
+    passwordKey: password
+
+  alerting:
+    # policies.yaml:
+    #   default_policy:
+    #     receiver: email_1
+    #   apiVersion: 1
+    #   policies:
+    #     - orgId: 1
+    #       receiver: email_1
+    #       # # <list> The labels by which incoming alerts are grouped together. For example,
+    #       # #        multiple alerts coming in for cluster=A and alertname=LatencyHigh would
+    #       # #        be batched into a single group.
+    #       # #
+    #       # #        To aggregate by all possible labels use the special value '...' as
+    #       # #        the sole label name, for example:
+    #       # #        group_by: ['...']
+    #       # #        This effectively disables aggregation entirely, passing through all
+    #       # #        alerts as-is. This is unlikely to be what you want, unless you have
+    #       # #        a very low alert volume or your upstream notification system performs
+    #       # #        its own grouping.
+    #       # group_by: ['...']
+    #       # # <list> a list of prometheus-like matchers that an alert rule has to fulfill to match the node (allowed chars
+    #       # #        [a-zA-Z_:])
+    #       matchers:
+    #         - severity=critical
+    #       #   - alertname = Watchdog
+    #       #   - service_id_X = serviceX
+    #       #   - severity =~ "warning|critical"
+    #       # # <list> a list of grafana-like matchers that an alert rule has to fulfill to match the node
+    #       # object_matchers:
+    #       #   - ['alertname', '=', 'CPUUsage']
+    #       #   - ['service_id-X', '=', 'serviceX']
+    #       #   - ['severity', '=~', 'warning|critical']
+    #       # # <list> Times when the route should be muted. These must match the name of a
+    #       # #        mute time interval.
+    #       # #        Additionally, the root node cannot have any mute times.
+    #       # #        When a route is muted it will not send any notifications, but
+    #       # #        otherwise acts normally (including ending the route-matching process
+    #       # #        if the `continue` option is not set)
+    #       # mute_time_intervals:
+    #       #   - abc
+    #       # # <duration> How long to initially wait to send a notification for a group
+    #       # #            of alerts. Allows to collect more initial alerts for the same group.
+    #       # #            (Usually ~0s to few minutes), default = 30s
+    #       group_wait: 30s
+    #       # # <duration> How long to wait before sending a notification about new alerts that
+    #       # #            are added to a group of alerts for which an initial notification has
+    #       # #            already been sent. (Usually ~5m or more), default = 5m
+    #       group_interval: 5m
+    #       # # <duration>  How long to wait before sending a notification again if it has already
+    #       # #             been sent successfully for an alert. (Usually ~3h or more), default = 4h
+    #       repeat_interval: 4h
+    #       # # <list> Zero or more child policies. The schema is the same as the root policy.
+    #       # # routes:
+    #       # #   # Another recursively nested policy...
+    #       # #   - receiver: another-receiver
+    #       # #     matchers:
+    #       # #       - ...
+    #       # #     ...
+    #     # - orgId: 1
+    #     #   receiver: ms_teams_1
+    #     # - orgId: 1
+    #     #   receiver: discord_1
+
+    rules.yaml:
+      apiVersion: 1
+      groups:
+        - orgId: 1
+          name: 'Logs rules'
+          folder: Logs
+          interval: 60s
+          rules:
+            - uid: log-error-alert
+              title: Log Error Pattern Detected
+              condition: A > 0
+              for: 1m
+              data:
+                - refId: A
+                  relativeTimeRange:
+                    from: 60
+                    to: 0
+                  datasourceUid: loki
+                  model:
+                    expr: count_over_time({namespace="monitoring"} |~ "\\[ERROR]|\\bERR\\b" [1m])
+                    instant: true
+                    format: time_series
+              noDataState: NoData
+              execErrorState: Error
+              annotations:
+                summary: Błąd w logach
+                description: Pojawił się wpis logu zawierający `[ERROR]` lub `ERR` w namespace `monitoring`
+              labels:
+                severity: warning
+
+    contactpoints.yaml:
+      secret:
+        apiVersion: 1
+        contactPoints:
+          - orgId: 1
+            name: Default provisioned contact points
+            receivers:
+              - uid: discord_1
+                type: discord
+                settings:
+                  # <string, required>
+                  url: https://discord.com/api/webhooks/1399094555412009072/IOAQ_kC-QqkkDKPxhynx9WpO_UL6J_x4eSmJwTD5GK658rQcJ_ia0X4XZ7wtnkV3_TCE
+                  # <string>
+                  #avatar_url: https://my_avatar
+                  # <bool>
+                  use_discord_username: false
+                  # <string>
+                  # message: |
+                  #   {{ `
+                  #   {{ define "default.message" }}
+                  #   {{ end }}
+                  #   ` }}
+              # - uid: ms_teams_1
+              #   type: teams
+              #   settings:
+              #     # <string, required>
+              #     url: https://ms_teams_url
+              #     # <string>
+              #     # title: |
+              #     #     {{ `
+              #     #     {{ define "default.title" }}
+              #     #     Bla bla bla test helma
+              #     #     {{ end }}
+              #     #     ` }}
+              #     # <string>
+              #     # sectiontitle: ''
+              #     # <string>
+              #     # message: |
+              #     #     {{ `
+              #     #     {{ define "default.message" }}
+              #     #     Bla bla bla test helma
+              #     #     {{ end }}
+              #     #     ` }}
+              - uid: email_1
+                type: email
+                settings:
+                  # <string, required>
+                  addresses: me@example.com;you@example.com
+                  # <bool>
+                  singleEmail: false
+                  # <string>
+                  # message: my optional message to include
+                  # <string>
+                  # subject: |
+                  #   {{ `
+                  #   {{ define "default.subject" }}
+                  #   [{{ .Labels.alertname }}] {{ .Status | toUpper }} - {{ .Labels.instance }}
+                  #   {{ end }}
+                  #   ` }}
+
+    templates.yaml:
+      apiVersion: 1
+      templates:
+        - orgId: 1
+          name: email_subject
+          template: |
+            {{ `
+            {{ define "default_title" }}
+            [{{ .Labels.alertname }}] {{ .Status | toUpper }} - {{ .Labels.instance }}
+            {{ end }}
+            ` }}
+
+        - orgId: 1
+          name: email_body
+          template: |
+            {{ `
+            {{ define "email_body" }}
+            Alert: {{ .Labels.alertname }}  
+            Status: {{ .Status | toUpper }}
+
+            {{ if .Annotations.summary }}
+            Summary: {{ .Annotations.summary }}
+            {{ end }}
+
+            {{ if .Annotations.description }}
+            Description: {{ .Annotations.description }}
+            {{ end }}
+
+            Labels:
+            {{ range $k, $v := .Labels }}
+              - {{ $k }}: {{ $v }}
+            {{ end }}
+
+            Starts At: {{ .StartsAt }}
+            Ends At: {{ .EndsAt }}
+
+            Link: {{ .ExternalURL }}
+            {{ end }}
+            ` }}
+
+        - orgId: 1
+          name: discord_template
+          template: |
+            {{ `
+            {{ define "discord_template" }}
+            **ALERT:** {{ .Labels.alertname }}  
+            **Status:** {{ .Status | toUpper }}  
+            **Instance:** {{ .Labels.instance }}
+
+            {{ if .Annotations.summary }}
+            **Summary:** {{ .Annotations.summary }}
+            {{ end }}
+
+            {{ if .Annotations.description }}
+            **Description:** {{ .Annotations.description }}
+            {{ end }}
+
+            **Start Time:** {{ .StartsAt }}  
+            **Dashboard:** {{ .ExternalURL }}
+            {{ end }}
+            ` }}
+
+        - orgId: 1
+          name: teams_template
+          template: |
+            {{ `
+            {{ define "teams_template" }}
+            ALERT: {{ .Labels.alertname }}
+            STATUS: {{ .Status | toUpper }}
+            INSTANCE: {{ .Labels.instance }}
+
+            {{ if .Annotations.summary }}
+            SUMMARY: {{ .Annotations.summary }}
+            {{ end }}
+
+            {{ if .Annotations.description }}
+            DESCRIPTION: {{ .Annotations.description }}
+            {{ end }}
+
+            STARTED: {{ .StartsAt }}
+            DASHBOARD LINK: {{ .ExternalURL }}
+            {{ end }}
+            ` }}
+
+    mutetimes.yaml:
+      apiVersion: 1
+      muteTimes:
+        - orgId: 1
+          name: night-time-mute
+          time_intervals:
+            - times:
+                - start_time: "22:00"
+                  end_time: "23:59"
+                - start_time: "00:00"
+                  end_time: "07:00"
+              # location: 'UTC'
+              weekdays: ["monday", "tuesday", "wednesday", "thursday", "friday"]
+
+  notifiers:
+    notifiers.yaml:
+      notifiers:
+      - name: email-notifier
+        type: email
+        uid: email_1
+        org_id: 1
+        is_default: true
+        settings:
+          addresses: hubertsob217@gmail.com
+      # delete_notifiers:
+
   dashboards:
     default:
       # -- Default dashboards to deploy. Override if you disable any components.

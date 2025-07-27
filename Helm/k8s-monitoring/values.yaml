@@ -45,6 +45,12 @@ destinations:
   - name: ClusterMimir
     type: prometheus
     url: http://lgtm-distributed-mimir-nginx/api/v1/push
+  - name: ClusterTempo
+    type: otlp
+    url: http://lgtm-distributed-lgtm-distributed-tempo-distributor/api/v1/push
+  # - name: ClusterPyroscope
+  #   type: pyroscope
+  #   url: http://lgtm-distributed-lgtm-distributed-tempo-distributor/api/v1/push
 #
 # Features
 #
@@ -148,7 +154,7 @@ podLogs:
 applicationObservability:
   # -- Enable receiving Application Observability.
   # @section -- Features - Application Observability
-  enabled: false
+  enabled: true
 
   # -- The destinations where application data will be sent. If empty, all capable destinations will be used.
   # @section -- Features - Application Observability
@@ -156,8 +162,10 @@ applicationObservability:
 
   # -- The receivers used for receiving application data.
   # @section -- Features - Application Observability
-  receivers: {}
-
+  receivers:
+    otlp:
+      grpc:
+        enabled: true
   # -- Which collector to assign this feature to. Do not change this unless you are sure of what you are doing.
   # @section -- Features - Application Observability
   # @ignored
@@ -255,6 +263,7 @@ profiling:
 
   # To see additional options, please see the [Profiling feature documentation](https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring/charts/feature-profiling).
 
+
 # -- Service Integrations enables gathering telemetry data for common services and applications deployed to Kubernetes.
 # To see the valid options, please see the [Service Integrations documentation](https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring/charts/feature-integrations).
 # @default -- No integrations enabled
@@ -321,7 +330,7 @@ alloy-logs:
 alloy-receiver:
   # -- Deploy the Alloy instance for opening receivers to collect application data.
   # @section -- Collectors - Alloy Receiver
-  enabled: false
+  enabled: true
 
   alloy:
     # -- The ports to expose for the Alloy receiver.

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+  namespace: {{ .Values.overrideNamespace | default .Release.Namespace | quote }}
+data:
+  APP_NAME: 'PodInspector'
+  ENABLE_ERROR_MODE_EXCEPTION: 'False'
+  ENABLE_ERROR_MODE_HARD_CRASH: 'False'
+  ENABLE_ERROR_MODE_LOG: 'False'
+  ENABLE_ERROR_MODE_SIGKILL: 'True'
+  ENABLE_ERROR_MODE_SOFT_CRASH: 'False'
+  ENABLE_PROFILING: 'False'
+  ENABLE_TRACING: 'False'
+  FAILURE_DELAY_MAX_MINUTES: '1'
+  PROFILING_BASIC_AUTH_ENABLED: 'False'
+  PROFILING_BASIC_AUTH_PASSWORD: 'admin'
+  PROFILING_BASIC_AUTH_USERNAME: 'admin'
+  PROFILING_ENDPOINT: 'http://k8s-monitoring-alloy-receiver:12345'
+  TRACING_ENDPOINT: 'http://k8s-monitoring-alloy-receiver:12345'
