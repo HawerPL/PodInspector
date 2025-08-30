@@ -10,3 +10,6 @@ service:
 
 podAnnotations:
   k8s.grafana.com/scrape: 'true'
+  k8s.grafana.com/metrics.path: '/metrics'
+  k8s.grafana.com/job: "PodInspector"
+  k8s.grafana.com/metrics.portNumber: "8080"
