@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PodInspector"
+version = "1.0.0"
+description = "PodInspector application"
+authors = [
+  { name="HawerPL" }
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi~=0.115.13",
+    "pydantic~=2.11.7",
+    "kubernetes~=33.1.0",
+    "uvicorn~=0.34.3",
+    "prometheus-fastapi-instrumentator~=7.1.0",
+    "pyroscope-io~=0.8.11"
+]
