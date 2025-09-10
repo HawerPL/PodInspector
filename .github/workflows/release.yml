@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "v*.*.*"   # np. v1.2.3
+      - "v*.*.*"
 
 jobs:
   release:
