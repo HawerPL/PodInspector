@@ -39,4 +39,3 @@ jobs:
         with:
           name: dist
           path: app/dist/*
-
