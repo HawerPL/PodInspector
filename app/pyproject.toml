@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "PodInspector"
 version = "1.0.0"
-description = "PodInspector application"
+description = "PodInspector application for k8s."
 authors = [
   { name="HawerPL" }
 ]
