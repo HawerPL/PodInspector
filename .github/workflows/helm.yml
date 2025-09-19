@@ -25,7 +25,7 @@ jobs:
       - uses: azure/setup-helm@v4
         with:
           version: 'latest'
-      - run: helm template Helm/PodInspector --values charts/PodInspector/values.yaml
+      - run: helm template charts/PodInspector --values charts/PodInspector/values.yaml
 
   package:
     runs-on: ubuntu-latest
