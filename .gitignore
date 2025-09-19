@@ -200,3 +200,4 @@ logs
 
 app/dist
 app/PodInspector.egg-info
+charts/packages
