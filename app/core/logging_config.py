@@ -15,7 +15,9 @@ def init_logging(log_level=logging.DEBUG):
         logger.handlers.clear()
 
     file_handler = RotatingFileHandler(
-        filename=LOG_DIR / "app.log", maxBytes=10 * 1024 * 1024, backupCount=5  # 10 MB
+        filename=LOG_DIR / "app.log",
+        maxBytes=10 * 1024 * 1024,
+        backupCount=5  # 10 MB
     )
     file_formatter = logging.Formatter(
         "[%(asctime)s] [%(levelname)s] %(name)s: %(message)s"
