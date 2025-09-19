@@ -7,6 +7,12 @@ on:
   pull_request:
     paths:
       - "app/**"
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch'
+        required: true
+        default: 'main'
 
 jobs:
   lint-test:
