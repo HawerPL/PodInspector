@@ -45,3 +45,16 @@ jobs:
         with:
           name: dist
           path: app/dist/*
+#  release:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/download-artifact@v4
+#        with:
+#          name: dist
+#          path: app/dist/*
+#      - name: Create GitHub Release with Helm package
+#        uses: softprops/action-gh-release@v2
+#        with:
+#          files: app/dist/*
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
