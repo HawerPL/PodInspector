@@ -23,7 +23,7 @@ jobs:
       - run: pip install -r requirements.txt
       - run: pip install black flake8
       - run: black --check app/
-      - run: flake8 app/
+      - run: flake8 app/ --max-line-length 120
 
   build:
     runs-on: ubuntu-latest
