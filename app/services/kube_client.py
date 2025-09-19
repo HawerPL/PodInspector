@@ -7,6 +7,7 @@ from app.core.settings import settings
 logger = logging.getLogger(__name__)
 _core_v1 = None
 
+
 def init_kube_client():
     logging.info(f"KUBECONFIG={settings.kube_config_file}")
     global _core_v1
@@ -18,7 +19,10 @@ def init_kube_client():
         logger.info("Loaded in-cluster kubpip e config")
     _core_v1 = client.CoreV1Api()
 
+
 def get_core_v1_api():
     if _core_v1 is None:
-        raise RuntimeError("Kubernetes client not initialized. Call init_kube_client() first.")
+        raise RuntimeError(
+            "Kubernetes client not initialized. Call init_kube_client() first."
+        )
     return _core_v1

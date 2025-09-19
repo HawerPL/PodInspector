@@ -11,17 +11,21 @@ from app.core.settings import settings
 
 logger = logging.getLogger(__name__)
 
+
 def _crash_hard():
     logger.warn("Triggering hard crash via os._exit(1)")
     os._exit(1)
+
 
 def _crash_soft():
     logger.warning("Triggering soft crash via sys.exit(1)")
     sys.exit(1)
 
+
 def _raise_exception():
     logger.warning("Triggering uncaught exception")
     raise RuntimeError("Simulated uncaught exception")
+
 
 def _kill_process():
     logger.warning("Sending SIGKILL to self")
@@ -30,6 +34,7 @@ def _kill_process():
         os._exit(1)
     else:
         os.kill(os.getpid(), signal.SIGKILL)
+
 
 def _log_error():
     logger.error("Simulated error log entry")

@@ -9,7 +9,6 @@ from app.services.failure_simulator import simulate_failure
 from app.services.kube_client import init_kube_client
 
 
-
 init_logging()
 
 if settings.enable_profiling:
@@ -26,21 +25,24 @@ Instrumentator().instrument(app).expose(app)
 app.include_router(router)
 
 
-#TODO: Zaktualizować do lifespan
+# TODO: Zaktualizować do lifespan
 @app.on_event("startup")
 def startup_event():
     init_kube_client()
-    if settings.enable_error_mode_log or \
-        settings.enable_error_mode_exception or \
-        settings.enable_error_mode_soft_crash or \
-        settings.enable_error_mode_hard_crash or \
-        settings.enable_error_mode_sigkill:
+    if (
+        settings.enable_error_mode_log
+        or settings.enable_error_mode_exception
+        or settings.enable_error_mode_soft_crash
+        or settings.enable_error_mode_hard_crash
+        or settings.enable_error_mode_sigkill
+    ):
         simulate_failure()
 
 
 @app.get("/healthz")
 def healthz():
     return {"status": "ok"}
+
 
 @app.get("/readyz")
 def readyz():

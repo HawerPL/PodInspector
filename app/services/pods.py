@@ -7,15 +7,19 @@ def get_running_pods():
     result = []
     for pod in pods.items:
         if pod.status.phase == "Running":
-            result.append({
-                "name": pod.metadata.name,
-                "namespace": pod.metadata.namespace,
-                "node": pod.spec.node_name
-            })
+            result.append(
+                {
+                    "name": pod.metadata.name,
+                    "namespace": pod.metadata.namespace,
+                    "node": pod.spec.node_name,
+                }
+            )
     return result
+
 
 def get_images():
     return ["nginx:1.23", "redis:7"]
+
 
 def get_restart_info():
     return [{"name": "app-1", "restarts": 2}]
