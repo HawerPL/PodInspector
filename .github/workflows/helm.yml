@@ -2,10 +2,10 @@ name: helm
 on:
   push:
     paths:
-      - "../../charts/**"
+      - "charts/**"
   pull_request:
     paths:
-      - "../../charts/**"
+      - "charts/**"
 
 jobs:
   lint:
