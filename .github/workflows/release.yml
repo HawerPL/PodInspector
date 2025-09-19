@@ -2,29 +2,41 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*.*.*"
+    paths:
+      - "app/**"
+  pull_request:
+    paths:
+      - "app/**"
 
 jobs:
-  release:
+  lint-test:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        python-version: [3.12]
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Set up Helm
-        uses: azure/setup-helm@v4
-
-      - name: Package Helm chart
-        run: |
-          helm lint Helm/PodInspector
-          helm package Helm/PodInspector --destination ./dist
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          files: |
-            dist/*.tgz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          python-version: ${{ matrix.pythons-version }}
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: pip install black flake8
+      - run: black --check app/
+      - run: flake8 app/
+
+  build:
+    runs-on: ubuntu-latest
+    needs: lint-test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - run: pip install build
+      - run: python -m build app
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: app/dist/*
+

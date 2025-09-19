@@ -9,7 +9,7 @@ description = "PodInspector application"
 authors = [
   { name="HawerPL" }
 ]
-readme = "README.md"
+
 requires-python = ">=3.11"
 dependencies = [
     "fastapi~=0.115.13",
@@ -19,3 +19,6 @@ dependencies = [
     "prometheus-fastapi-instrumentator~=7.1.0",
     "pyroscope-io~=0.8.11"
 ]
+
+[tool.setuptools]
+packages = ["api", "core", "services"]

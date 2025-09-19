@@ -197,3 +197,6 @@ KUBECONFIG
 
 .idea
 logs
+
+app/dist
+app/PodInspector.egg-info
