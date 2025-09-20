@@ -8,21 +8,33 @@ metadata:
   annotations:
   {{- range .Values.ingress.annotations }}
     {{- range $key, $value := . }}
-      {{ $key }}: {{ tpl $value | quote }}
+      {{ $key }}: {{ tpl $value $ | quote }}
     {{- end }}
   {{- end }}
   {{- end }}
 spec:
   ingressClassName: {{ .Values.ingress.ingressClassName | default "nginx" }}
+  {{- if .Values.ingress.tls }}
+  tls:
+    {{- range .Values.ingress.tls }}
+    - secretName: {{ .secretName }}
+      hosts:
+      {{- range .hosts }}
+        - {{ . }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
   rules:
-    - host: hawer.k8s.eu
+    {{- range .Values.ingress.rules }}
+    - host: {{ .host }}
       http:
         paths:
           - backend:
               service:
-                name: {{ .Release.Name }}-service
+                name: {{ tpl .name $ }}
                 port:
-                  number: {{ .Values.service.port | default "8080" }}
-            pathType: Prefix
-            path: /
+                  number: {{ .port | default "8080" }}
+            pathType: {{ .pathType }}
+            path: {{ .path }}
+    {{- end }}
 {{- end }}

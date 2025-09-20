@@ -13,6 +13,16 @@ ingress:
   enabled: true
   ingressClassName: traefik
   annotations: {}
+  tls:
+    - hosts:
+        - hawer.k8s.eu
+      secretName: domain-certificate
+  rules:
+    - host: hawer.k8s.eu
+      name: "{{ .Release.Name }}-service"
+      port: 8080
+      pathType: Prefix
+      path: /
 
 podAnnotations:
   k8s.grafana.com/scrape: 'true'
