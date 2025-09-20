@@ -42,26 +42,26 @@ def _log_error():
 
 def simulate_failure():
     logging.info("Error mode is enabled")
-    max_delay = settings.failure_delay_max_minutes
+    max_delay = settings.FAILURE_DELAY_MAX_MINUTES
     delay_seconds = random.randint(0, max_delay * 60)
     logger.info(f"Simulated failure will trigger in {delay_seconds} seconds")
 
     def delayed_failure():
         time.sleep(delay_seconds)
 
-        if settings.enable_error_mode_log is True:
+        if settings.ENABLE_ERROR_MODE_LOG is True:
             _log_error()
 
-        if settings.enable_error_mode_exception is True:
+        if settings.ENABLE_ERROR_MODE_EXCEPTION is True:
             _raise_exception()
 
-        if settings.enable_error_mode_soft_crash is True:
+        if settings.ENABLE_ERROR_MODE_SOFT_CRASH is True:
             _crash_soft()
 
-        if settings.enable_error_mode_hard_crash is True:
+        if settings.ENABLE_ERROR_MODE_HARD_CRASH is True:
             _crash_hard()
 
-        if settings.enable_error_mode_sigkill is True:
+        if settings.ENABLE_ERROR_MODE_SIGKILL is True:
             _kill_process()
 
     threading.Thread(target=delayed_failure, daemon=True).start()

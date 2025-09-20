@@ -20,11 +20,6 @@ docker build -t podinspector:latest
 |----------------------------------|-----------------------------------------------------------------------------------|--------------------------------------------|
 | KUBECONFIG                         | Lokalizacja pliku konfiguracji klienta k8s dla aplikacji wdrożonej poza klastrem. | ~/.kube/config                             |
 | APP_NAME                         | Nazwa aplikacji.                                                                  | PodInspector                               |
-| ENABLE_PROFILING                         | Uruchomienie profilowania.                                                        | ~/.kube/config                             |
-| PROFILING_ENDPOINT                         | Adres końcowy profilowania.                                                       | http://k8s-monitoring-alloy-receiver:12345 |
-| PROFILING_BASIC_AUTH_ENABLED                         | Włączenie autoryzacji dla profilowania.                                           | False                             |
-| PROFILING_BASIC_AUTH_USERNAME                         | Nazwa użytkownika dla autoryzowanego profilowania.                                | admin                            |
-| PROFILING_BASIC_AUTH_PASSWORD                         | Hasło użytkownika dla autoryzowanego profilowania.                                | admin                           |
 | ENABLE_TRACING                         | Uruchomienie tracingu.                                                            | False                                      |
 | TRACING_ENDPOINT                         | Adres końcowy tracingu.                                                           | http://k8s-monitoring-alloy-receiver:12345 |
 | ENABLE_ERROR_MODE_LOG                         | Uruchomienie trybu awarii - log.                                                  | False                                      |

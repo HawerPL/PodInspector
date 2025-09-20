@@ -7,19 +7,22 @@ from app.core.logging_config import init_logging
 from app.core.settings import settings
 from app.services.failure_simulator import simulate_failure
 from app.services.kube_client import init_kube_client
-
+import logging
 
 init_logging()
 
-if settings.enable_profiling:
+if settings.ENABLE_PROFILING:
     import pyroscope
-
+    logging.info(f"Enabling Profiling")
     pyroscope.configure(
-        application_name=settings.app_name,
-        server_address=settings.profiling_address,
+        application_name=settings.APP_NAME,
+        server_address=settings.PROFILING_ENDPOINT,
         sample_rate=100,
+        detect_subprocesses=False,
+        oncpu=True,
+        gil_only=True
     )
-app = FastAPI(title=settings.app_name, version="1.0", log_config=None)
+app = FastAPI(title=settings.APP_NAME, version="1.0", log_config=None)
 Instrumentator().instrument(app).expose(app)
 
 app.include_router(router)
@@ -30,12 +33,18 @@ app.include_router(router)
 def startup_event():
     init_kube_client()
     if (
-        settings.enable_error_mode_log
-        or settings.enable_error_mode_exception
-        or settings.enable_error_mode_soft_crash
-        or settings.enable_error_mode_hard_crash
-        or settings.enable_error_mode_sigkill
+        settings.ENABLE_ERROR_MODE_LOG
+        or settings.ENABLE_ERROR_MODE_EXCEPTION
+        or settings.ENABLE_ERROR_MODE_SOFT_CRASH
+        or settings.ENABLE_ERROR_MODE_HARD_CRASH
+        or settings.ENABLE_ERROR_MODE_SIGKILL
     ):
+        logging.debug(f"""
+            MODE_LOG: {settings.ENABLE_ERROR_MODE_LOG}
+            MODE_EXCEPT: {settings.ENABLE_ERROR_MODE_EXCEPTION}
+            MODE_SOFT: {settings.ENABLE_ERROR_MODE_SOFT_CRASH}
+            MODE_HARD: {settings.ENABLE_ERROR_MODE_HARD_CRASH}
+            MODE_SIGKILL: {settings.ENABLE_ERROR_MODE_SIGKILL}""")
         simulate_failure()
 
 

@@ -1,38 +1,28 @@
 from pydantic.v1 import BaseSettings
-import os
+from typing import Optional
 
 
 class Settings(BaseSettings):
-    app_name: str = os.getenv("APP_NAME", "PodInspector")
-    kube_config_file: str = os.getenv("KUBECONFIG", "~/.kube/config")
-    enable_profiling: bool = os.getenv("ENABLE_PROFILING", False)
-    profiling_endpoint: str = os.getenv(
-        "PROFILING_ENDPOINT", "http://k8s-monitoring-alloy-receiver:12345"
-    )
-    profiling_basic_auth_enabled: bool = os.getenv(
-        "PROFILING_BASIC_AUTH_ENABLED", False
-    )
-    profiling_basic_auth_username: str = os.getenv(
-        "PROFILING_BASIC_AUTH_USERNAME", "admin"
-    )
-    profiling_basic_auth_password: str = os.getenv(
-        "PROFILING_BASIC_AUTH_PASSWORD", "admin"
-    )
-    enable_tracing: bool = os.getenv("ENABLE_TRACING", False)
-    tracing_endpoint: str = os.getenv(
-        "TRACING_ENDPOINT", "http://k8s-monitoring-alloy-receiver:12345"
-    )
+    APP_NAME: str = "PodInspector"
+    KUBECONFIG: str = "~/.kube/config"
+    ENABLE_PROFILING: bool = True
+    PROFILING_ENDPOINT: str = "http://k8s-monitoring-alloy-receiver:12345"
+    PROFILING_BASIC_AUTH_ENABLED: bool = False
+    PROFILING_BASIC_AUTH_USERNAME: str = "admin"
+    PROFILING_BASIC_AUTH_PASSWORD: str = "admin"
+    ENABLE_TRACING: bool = False
+    TRACING_ENDPOINT: str = "http://k8s-monitoring-alloy-receiver:12345"
 
-    enable_error_mode_log: bool = os.getenv("ENABLE_ERROR_MODE_LOG", False)
-    enable_error_mode_exception: bool = os.getenv("ENABLE_ERROR_MODE_EXCEPTION", False)
-    enable_error_mode_soft_crash: bool = os.getenv(
-        "ENABLE_ERROR_MODE_SOFT_CRASH", False
-    )
-    enable_error_mode_hard_crash: bool = os.getenv(
-        "ENABLE_ERROR_MODE_HARD_CRASH", False
-    )
-    enable_error_mode_sigkill: bool = os.getenv("ENABLE_ERROR_MODE_SIGKILL", False)
-    failure_delay_max_minutes: bool = os.getenv("FAILURE_DELAY_MAX_MINUTES", 3600)
+    ENABLE_ERROR_MODE_LOG: bool = False
+    ENABLE_ERROR_MODE_EXCEPTION: bool = False
+    ENABLE_ERROR_MODE_SOFT_CRASH: bool = False
+    ENABLE_ERROR_MODE_HARD_CRASH: bool = False
+    ENABLE_ERROR_MODE_SIGKILL: bool = False
+    FAILURE_DELAY_MAX_MINUTES: int = 3600
+
+    class Config:
+        env_file: Optional[str] = ".env"
+        env_file_encoding = "utf-8"
 
 
 settings = Settings()

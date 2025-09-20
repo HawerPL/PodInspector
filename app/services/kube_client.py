@@ -9,10 +9,10 @@ _core_v1 = None
 
 
 def init_kube_client():
-    logging.info(f"KUBECONFIG={settings.kube_config_file}")
+    logging.info(f"KUBECONFIG={settings.KUBECONFIG}")
     global _core_v1
     try:
-        config.load_kube_config(config_file=settings.kube_config_file)
+        config.load_kube_config(config_file=settings.KUBECONFIG)
         logger.info("Loaded kube config from ~/.kube/config")
     except ConfigException:
         config.load_incluster_config()
