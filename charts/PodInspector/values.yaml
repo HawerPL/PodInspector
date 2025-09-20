@@ -5,8 +5,14 @@ image:
 overrideNamespace: "monitoring"
 
 service:
+  annotations: {}
   type: ClusterIP
   port: 8080
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  annotations: {}
 
 podAnnotations:
   k8s.grafana.com/scrape: 'true'
