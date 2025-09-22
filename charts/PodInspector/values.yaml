@@ -29,3 +29,25 @@ podAnnotations:
   k8s.grafana.com/metrics.path: '/metrics'
   k8s.grafana.com/job: "PodInspector"
   k8s.grafana.com/metrics.portNumber: "8080"
+
+
+configuration:
+  appName: PodInspector
+  errorMode:
+    exception: 'false'
+    hardCrash: 'false'
+    softCrash: 'false'
+    log: 'false'
+    sigkill: 'false'
+    failureDelayMaxMinutes: 3600
+  profiling:
+    enabled: 'true'
+    auth:
+      enabled: 'false'
+      username: admin
+      password: admin
+    endpoint: http://pyroscope.k8s.eu
+  tracing:
+    enabled: 'false'
+    endpoint: http://k8s-monitoring-alloy-receiver:12345
+

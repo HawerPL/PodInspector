@@ -1,6 +1,6 @@
 # pod-inspector
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.1](https://img.shields.io/badge/AppVersion-1.0.1-informational?style=flat-square)
 
 Simple application to learn how to create helm charts.
 
@@ -18,14 +18,39 @@ Kubernetes: `>=1.23`
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| configuration.appName | string | `"PodInspector"` |  |
+| configuration.errorMode.exception | string | `"false"` |  |
+| configuration.errorMode.failureDelayMaxMinutes | int | `3600` |  |
+| configuration.errorMode.hardCrash | string | `"false"` |  |
+| configuration.errorMode.log | string | `"false"` |  |
+| configuration.errorMode.sigkill | string | `"false"` |  |
+| configuration.errorMode.softCrash | string | `"false"` |  |
+| configuration.profiling.auth.enabled | string | `"false"` |  |
+| configuration.profiling.auth.password | string | `"admin"` |  |
+| configuration.profiling.auth.username | string | `"admin"` |  |
+| configuration.profiling.enabled | string | `"true"` |  |
+| configuration.profiling.endpoint | string | `"http://pyroscope.k8s.eu"` |  |
+| configuration.tracing.enabled | string | `"false"` |  |
+| configuration.tracing.endpoint | string | `"http://k8s-monitoring-alloy-receiver:12345"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"registry.hawer.eu/podinspector"` |  |
 | image.tag | string | `"latest"` |  |
+| ingress.annotations | object | `{}` |  |
+| ingress.enabled | bool | `true` |  |
+| ingress.ingressClassName | string | `"traefik"` |  |
+| ingress.rules[0].host | string | `"hawer.k8s.eu"` |  |
+| ingress.rules[0].name | string | `"{{ .Release.Name }}-service"` |  |
+| ingress.rules[0].path | string | `"/"` |  |
+| ingress.rules[0].pathType | string | `"Prefix"` |  |
+| ingress.rules[0].port | int | `8080` |  |
+| ingress.tls[0].hosts[0] | string | `"hawer.k8s.eu"` |  |
+| ingress.tls[0].secretName | string | `"domain-certificate"` |  |
 | overrideNamespace | string | `"monitoring"` |  |
 | podAnnotations."k8s.grafana.com/job" | string | `"PodInspector"` |  |
 | podAnnotations."k8s.grafana.com/metrics.path" | string | `"/metrics"` |  |
 | podAnnotations."k8s.grafana.com/metrics.portNumber" | string | `"8080"` |  |
 | podAnnotations."k8s.grafana.com/scrape" | string | `"true"` |  |
+| service.annotations | object | `{}` |  |
 | service.port | int | `8080` |  |
 | service.type | string | `"ClusterIP"` |  |
 

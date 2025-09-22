@@ -1,5 +1,5 @@
 ### Grafana stack
-Mimir, Loki, Tempo and Phyroscope for cluster monitoring and PodInspector app.
+Mimir, Loki and Tempo for cluster monitoring and PodInspector app.
 
 ```
 helm repo add grafana https://grafana.github.io/helm-charts

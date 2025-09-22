@@ -1,9 +1,9 @@
 apiVersion: v2
 name: pod-inspector
-version: 1.0.0
+version: 1.0.1
 kubeVersion: ">=1.23"
 description: Simple application to learn how to create helm charts.
 type: application
 maintainers:
   - name: "HawerPL"
-appVersion: 1.0.0
+appVersion: 1.0.1

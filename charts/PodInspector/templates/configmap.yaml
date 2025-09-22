@@ -4,17 +4,17 @@ metadata:
   name: {{ .Release.Name }}-configmap
   namespace: {{ .Values.overrideNamespace | default .Release.Namespace | quote }}
 data:
-  APP_NAME: 'PodInspector'
-  ENABLE_ERROR_MODE_EXCEPTION: 'False'
-  ENABLE_ERROR_MODE_HARD_CRASH: 'False'
-  ENABLE_ERROR_MODE_LOG: 'False'
-  ENABLE_ERROR_MODE_SIGKILL: 'True'
-  ENABLE_ERROR_MODE_SOFT_CRASH: 'False'
-  ENABLE_PROFILING: 'False'
-  ENABLE_TRACING: 'False'
-  FAILURE_DELAY_MAX_MINUTES: '1'
-  PROFILING_BASIC_AUTH_ENABLED: 'False'
-  PROFILING_BASIC_AUTH_PASSWORD: 'admin'
-  PROFILING_BASIC_AUTH_USERNAME: 'admin'
-  PROFILING_ENDPOINT: 'http://k8s-monitoring-alloy-receiver:12345'
-  TRACING_ENDPOINT: 'http://k8s-monitoring-alloy-receiver:12345'
+  APP_NAME: {{ tpl .Values.configuration.appName . | quote }}
+  ENABLE_ERROR_MODE_EXCEPTION: {{ .Values.configuration.errorMode.exception | quote }}
+  ENABLE_ERROR_MODE_HARD_CRASH: {{ .Values.configuration.errorMode.hardCrash | quote }}
+  ENABLE_ERROR_MODE_LOG: {{ .Values.configuration.errorMode.log | quote }}
+  ENABLE_ERROR_MODE_SIGKILL: {{ .Values.configuration.errorMode.sigkill | quote }}
+  ENABLE_ERROR_MODE_SOFT_CRASH: {{ .Values.configuration.errorMode.softCrash | quote }}
+  ENABLE_PROFILING: {{ .Values.configuration.profiling.enabled | quote }}
+  ENABLE_TRACING: {{ .Values.configuration.tracing.enabled | quote }}
+  FAILURE_DELAY_MAX_MINUTES: {{ .Values.configuration.errorMode.failureDelayMaxMinutes | quote }}
+  PROFILING_BASIC_AUTH_ENABLED: {{ .Values.configuration.profiling.auth.enabled | quote }}
+  PROFILING_BASIC_AUTH_PASSWORD: {{ .Values.configuration.profiling.auth.password | quote }}
+  PROFILING_BASIC_AUTH_USERNAME: {{ .Values.configuration.profiling.auth.username | quote }}
+  PROFILING_ENDPOINT: {{ tpl .Values.configuration.profiling.endpoint . | quote }}
+  TRACING_ENDPOINT: {{ tpl .Values.configuration.tracing.endpoint . | quote }}
