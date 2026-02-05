@@ -170,7 +170,7 @@ grafana:
                 type: discord
                 settings:
                   # <string, required>
-                  url: https://discord.com/api/webhooks/1399094555412009072/IOAQ_kC-QqkkDKPxhynx9WpO_UL6J_x4eSmJwTD5GK658rQcJ_ia0X4XZ7wtnkV3_TCE
+                  url:
                   # <string>
                   #avatar_url: https://my_avatar
                   # <bool>

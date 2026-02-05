@@ -14,7 +14,7 @@ init_logging()
 if settings.ENABLE_PROFILING:
     import pyroscope
 
-    logging.info(f"Enabling Profiling")
+    logging.info("Enabling Profiling")
     pyroscope.configure(
         application_name=settings.APP_NAME,
         server_address=settings.PROFILING_ENDPOINT,
