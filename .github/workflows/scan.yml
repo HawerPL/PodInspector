@@ -1,0 +1,29 @@
+name: scan
+
+on:
+  push:
+    paths:
+      - "app/**"
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "app/**"
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch'
+        required: true
+        default: 'main'
+ 
+jobs:
+  sonarqube:
+    name: SonarQube
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
