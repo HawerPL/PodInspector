@@ -1,14 +1,18 @@
 # PodInspector
+
 Prosta aplikacja stworzona do nauki tworzenia helm chartów, korzystania z ArgoCD oraz konfiguracji monitoringów w Grafanie.
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=HawerPL_PodInspector&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=HawerPL_PodInspector) [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=HawerPL_PodInspector&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=HawerPL_PodInspector) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=HawerPL_PodInspector&metric=bugs)](https://sonarcloud.io/summary/new_code?id=HawerPL_PodInspector) [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=HawerPL_PodInspector&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=HawerPL_PodInspector)
+
 ## Spis treści
+
 * [Budowanie obrazu aplikacji](#budowanie-obrazu-aplikacji)
 * [Konfiguracja](#konfiguracja)
 * [Uruchomienie aplikacji](#uruchomienie-aplikacji)
 
 ## Budowanie obrazu aplikacji
 
-```
+```bash
 docker build -t podinspector:latest
 ```
 
@@ -21,24 +25,25 @@ docker build -t podinspector:latest
 | KUBECONFIG                         | Lokalizacja pliku konfiguracji klienta k8s dla aplikacji wdrożonej poza klastrem. | ~/.kube/config                             |
 | APP_NAME                         | Nazwa aplikacji.                                                                  | PodInspector                               |
 | ENABLE_TRACING                         | Uruchomienie tracingu.                                                            | False                                      |
-| TRACING_ENDPOINT                         | Adres końcowy tracingu.                                                           | http://k8s-monitoring-alloy-receiver:12345 |
+| TRACING_ENDPOINT                         | Adres końcowy tracingu.                                                           | <http://k8s-monitoring-alloy-receiver:12345> |
 | ENABLE_ERROR_MODE_LOG                         | Uruchomienie trybu awarii - log.                                                  | False                                      |
 | ENABLE_ERROR_MODE_EXCEPTION                         | Uruchomienie trybu awarii - wyjątek.                                              | False                                      |
 | ENABLE_ERROR_MODE_SOFT_CRASH                         | Uruchomienie trybu awarii soft crash.                                             | False                                      |
 | ENABLE_ERROR_MODE_HARD_CRASH                         | Uruchomienie trybu awarii - hard crash.                                           | False                                      |
-| ENABLE_ERROR_MODE_SIGKILL                         | LUruchomienie trybu awarii - SIGKILL.                                             | False                                      |
+| ENABLE_ERROR_MODE_SIGKILL                         | Uruchomienie trybu awarii - SIGKILL.                                             | False                                      |
 | FAILURE_DELAY_MAX_MINUTES                         | .                                                                                 | 3600                                       |
 
 ## Uruchomienie aplikacji
 
 ### Docker
+
 W celu uruchomienia aplikacji poza klastrem w dockerze należy przekazać lokalizację pliku konfiguracyjnego klienta k8s.
-```
+
+```bash
 docker run -p 8080:8080 -v /home/hawer/podinspector/KUBECONFIG:/tmp/KUBECONFIG -e KUBECONFIG=/tmp/KUBECONFIG podinspector:latest
 ```
 
 ### Helm
-
 
 ```
 helm update --install monitoring charts/PodInspector -f charts/PodInspector/values.yaml
