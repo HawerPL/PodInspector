@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "app/**"
+      - "sonar-project.properties"
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
