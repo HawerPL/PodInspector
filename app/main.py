@@ -40,14 +40,12 @@ def startup_event():
         or settings.ENABLE_ERROR_MODE_HARD_CRASH
         or settings.ENABLE_ERROR_MODE_SIGKILL
     ):
-        logging.debug(
-            f"""
+        logging.debug(f"""
             MODE_LOG: {settings.ENABLE_ERROR_MODE_LOG}
             MODE_EXCEPT: {settings.ENABLE_ERROR_MODE_EXCEPTION}
             MODE_SOFT: {settings.ENABLE_ERROR_MODE_SOFT_CRASH}
             MODE_HARD: {settings.ENABLE_ERROR_MODE_HARD_CRASH}
-            MODE_SIGKILL: {settings.ENABLE_ERROR_MODE_SIGKILL}"""
-        )
+            MODE_SIGKILL: {settings.ENABLE_ERROR_MODE_SIGKILL}""")
         simulate_failure()
 
 
