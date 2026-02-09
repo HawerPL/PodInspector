@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install -r pytest pytest-cov
+          pip install pytest pytest-cov
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
