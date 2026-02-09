@@ -9,6 +9,10 @@ RUN pip install --no-cache-dir --upgrade pip \
 
 COPY app/ ./app
 
+RUN useradd -m podinspector \
+    && chown podinspector:podinspector -R /app
+USER podinspector
+
 HEALTHCHECK CMD curl -f http://localhost:8080/healthz || exit 1
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
