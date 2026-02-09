@@ -2,6 +2,9 @@
 .gitignore
 __pycache__
 *.pyc
-app/tests
+tests
 charts
 logs
+app/dist
+app/PodInspector.egg-info
+coverage.xml
