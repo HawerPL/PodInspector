@@ -1,3 +1,6 @@
+import platform
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 from app.api.routes import router
@@ -11,7 +14,7 @@ import logging
 
 init_logging()
 
-if settings.ENABLE_PROFILING:
+if settings.ENABLE_PROFILING and platform.system() != "Windows":
     import pyroscope
 
     logging.info("Enabling Profiling")
@@ -23,16 +26,24 @@ if settings.ENABLE_PROFILING:
         oncpu=True,
         gil_only=True,
     )
-app = FastAPI(title=settings.APP_NAME, version="1.0", log_config=None)
+
+
+def create_app():
+    app = FastAPI(title=settings.APP_NAME, version="1.0", log_config=None)
+    app.include_router(router)
+    return app
+
+
+app = create_app()
 Instrumentator().instrument(app).expose(app)
 
-app.include_router(router)
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logging.info("Application startup")
 
-# TODO: Zaktualizować do lifespan
-@app.on_event("startup")
-def startup_event():
     init_kube_client()
+
     if (
         settings.ENABLE_ERROR_MODE_LOG
         or settings.ENABLE_ERROR_MODE_EXCEPTION
@@ -47,6 +58,10 @@ def startup_event():
             MODE_HARD: {settings.ENABLE_ERROR_MODE_HARD_CRASH}
             MODE_SIGKILL: {settings.ENABLE_ERROR_MODE_SIGKILL}""")
         simulate_failure()
+
+    yield
+
+    logging.info("Application shutdown")
 
 
 @app.get("/healthz")
