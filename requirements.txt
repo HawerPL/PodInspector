@@ -5,4 +5,4 @@ uvicorn~=0.34.3
 prometheus-fastapi-instrumentator~=7.1.0
 pyroscope-io~=0.8.11
 httpx~=0.28.1
-pytest-cov~=7
+pytest-cov~=7.0.0

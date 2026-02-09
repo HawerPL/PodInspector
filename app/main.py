@@ -71,5 +71,4 @@ def healthz():
 
 @app.get("/readyz")
 def readyz():
-    # tutaj możesz dodać np. sprawdzenie Redis/K8s
     return {"status": "ready"}
