@@ -27,17 +27,6 @@ if settings.ENABLE_PROFILING and platform.system() != "Windows":
         gil_only=True,
     )
 
-
-def create_app():
-    app = FastAPI(title=settings.APP_NAME, version="1.0", log_config=None)
-    app.include_router(router)
-    return app
-
-
-app = create_app()
-Instrumentator().instrument(app).expose(app)
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logging.info("Application startup")
@@ -62,6 +51,16 @@ async def lifespan(app: FastAPI):
     yield
 
     logging.info("Application shutdown")
+
+
+def create_app():
+    app = FastAPI(title=settings.APP_NAME, version="1.0", log_config=None, lifespan=lifespan)
+    app.include_router(router)
+    return app
+
+
+app = create_app()
+Instrumentator().instrument(app).expose(app)
 
 
 @app.get("/healthz")

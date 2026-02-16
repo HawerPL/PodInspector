@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=82", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -10,14 +10,14 @@ authors = [
   { name="HawerPL" }
 ]
 
-requires-python = ">=3.11"
+requires-python = ">=3.14"
 dependencies = [
-    "fastapi~=0.115.13",
-    "pydantic~=2.11.7",
-    "kubernetes~=33.1.0",
-    "uvicorn~=0.34.3",
+    "fastapi~=0.129.0",
+    "pydantic~=2.12.5",
+    "kubernetes~=35",
+    "uvicorn~=0.40",
     "prometheus-fastapi-instrumentator~=7.1.0",
-    "pyroscope-io~=0.8.11"
+    "pyroscope-io~=1.0.1"
 ]
 
 [tool.setuptools]

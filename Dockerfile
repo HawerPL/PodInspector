@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.14.3-slim
 LABEL AUTHOR=HawerPL
 
 WORKDIR /app
