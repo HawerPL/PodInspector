@@ -1,4 +1,4 @@
-name: scan
+name: SonarQube Scan with pytest coverage
 
 on:
   push:

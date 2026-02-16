@@ -1,4 +1,4 @@
-name: helm
+name: Check and generete Helm chart
 on:
   push:
     paths:

@@ -1,4 +1,4 @@
-name: python
+name: Check and build Python package
 
 on:
   push:
