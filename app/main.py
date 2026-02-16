@@ -22,10 +22,10 @@ if settings.ENABLE_PROFILING and platform.system() != "Windows":
         application_name=settings.APP_NAME,
         server_address=settings.PROFILING_ENDPOINT,
         sample_rate=100,
-        detect_subprocesses=False,
         oncpu=True,
         gil_only=True,
     )
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -54,7 +54,9 @@ async def lifespan(app: FastAPI):
 
 
 def create_app():
-    app = FastAPI(title=settings.APP_NAME, version="1.0", log_config=None, lifespan=lifespan)
+    app = FastAPI(
+        title=settings.APP_NAME, version="1.0", log_config=None, lifespan=lifespan
+    )
     app.include_router(router)
     return app
 

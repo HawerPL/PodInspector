@@ -1,5 +1,4 @@
-from pydantic.v1 import BaseSettings
-from typing import Optional
+from pydantic_settings import SettingsConfigDict, BaseSettings
 
 
 class Settings(BaseSettings):
@@ -19,10 +18,7 @@ class Settings(BaseSettings):
     ENABLE_ERROR_MODE_HARD_CRASH: bool = False
     ENABLE_ERROR_MODE_SIGKILL: bool = False
     FAILURE_DELAY_MAX_MINUTES: int = 3600
-
-    class Config:
-        env_file: Optional[str] = ".env"
-        env_file_encoding = "utf-8"
+    model_config = SettingsConfigDict(env_file_encoding="utf-8")
 
 
 settings = Settings()
