@@ -57,40 +57,8 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
           category: 'trivy-docker'
-
-      - name: Run Trivy vulnerability scanner (Table)
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: podinspector:${{ github.sha }}
-          format: 'table'
-          severity: 'CRITICAL,HIGH,MEDIUM'
-          exit-code: '0'  # Nie failuj workflow na znalezionych vulnerabilities
-
-      - name: Run Trivy vulnerability scanner (JSON for artifacts)
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: podinspector:${{ github.sha }}
-          format: 'json'
-          output: 'trivy-results.json'
-          severity: 'CRITICAL,HIGH,MEDIUM,LOW'
-
-      - name: Upload Trivy JSON results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: trivy-results-${{ github.sha }}
-          path: trivy-results.json
-          retention-days: 30
-
-      - name: Check for critical vulnerabilities
-        run: |
-          CRITICAL=$(docker run --rm aquasec/trivy:latest image --severity CRITICAL --format json podinspector:${{ github.sha }} | jq '.Results[].Vulnerabilities | length')
-          echo "Critical vulnerabilities found: $CRITICAL"
-          if [ "$CRITICAL" -gt "0" ]; then
-            echo "::warning::Found $CRITICAL critical vulnerabilities"
-          fi
