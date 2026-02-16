@@ -34,14 +34,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
-      - name: Install Python dependencies
+      - name: Install dependencies
         run: |
           pip install -r requirements.txt
-
-      - name: Install Node.js dependencies
-        run: |
           npm install -g @redocly/cli
 
       - name: Generate OpenAPI JSON
