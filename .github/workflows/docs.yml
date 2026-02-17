@@ -38,7 +38,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          npm install -g @redocly/cli
+          npm install --ignore-scripts -g @redocly/cli
 
       - name: Generate OpenAPI JSON
         run: |

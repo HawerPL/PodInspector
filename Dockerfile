@@ -14,7 +14,9 @@ RUN pip install --upgrade pip \
     && pip install -r requirements.txt \
     && useradd --system --create-home --uid 10001 podinspector
 
-COPY --chown=podinspector:podinspector app/ ./app
+COPY --chown=podinspector:podinspector --chmod=550 app/ ./app
+
+RUN mkdir -p /app/logs && chown podinspector:podinspector /app/logs
 
 USER podinspector
 
