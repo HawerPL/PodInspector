@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - "charts/**"
+      - ".github/workflows/helm.yml"
   pull_request:
     paths:
       - "charts/**"

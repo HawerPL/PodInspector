@@ -10,7 +10,7 @@ on:
       - "Dockerfile"
       - ".dockerignore"
       - "requirements.txt"
-      - ".github/workflows/docker-build-and-scan.yml"
+      - ".github/workflows/docker.yml"
   pull_request:
     paths:
       - "app/**"

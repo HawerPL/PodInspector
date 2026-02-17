@@ -6,6 +6,7 @@ on:
       - "app/**"
       - "tests/**"
       - "sonar-project.properties"
+      - ".github/workflows/scan.yml"
   pull_request:
     types: [opened, synchronize, reopened]
     paths:

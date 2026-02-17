@@ -13,7 +13,7 @@ Prosta aplikacja stworzona do nauki tworzenia helm chartów, korzystania z ArgoC
 ## Budowanie obrazu aplikacji
 
 ```bash
-docker build -t podinspector:latest
+docker buildx build -t podinspector:latest .
 ```
 
 ## Konfiguracja
