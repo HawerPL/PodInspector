@@ -4,7 +4,7 @@ from pydantic_settings import SettingsConfigDict, BaseSettings
 class Settings(BaseSettings):
     APP_NAME: str = "PodInspector"
     KUBECONFIG: str = "~/.kube/config"
-    ENABLE_PROFILING: bool = True
+    ENABLE_PROFILING: bool = False
     PROFILING_ENDPOINT: str = "http://k8s-monitoring-alloy-receiver:12345"
     PROFILING_BASIC_AUTH_ENABLED: bool = False
     PROFILING_BASIC_AUTH_USERNAME: str = "admin"
