@@ -25,8 +25,11 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
             limits:
-              cpu: 50m
+              cpu: 500m
               memory: 150Mi
+            requests:
+              cpu: 100m
+              memory: 64Mi
           ports:
             - containerPort: {{ .Values.service.port | default 8080 }}
           livenessProbe:
