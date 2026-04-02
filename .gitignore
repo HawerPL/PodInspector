@@ -204,3 +204,5 @@ charts/packages
 
 app/.env
 .env
+
+.sonar

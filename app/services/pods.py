@@ -1,20 +1,23 @@
 from app.services.kube_client import get_core_v1_api
 
 
-def get_running_pods():
+def get_running_pods(namespace: str | None = None) -> list[dict]:
     core_v1 = get_core_v1_api()
-    pods = core_v1.list_pod_for_all_namespaces(watch=False)
-    result = []
-    for pod in pods.items:
-        if pod.status.phase == "Running":
-            result.append(
-                {
-                    "name": pod.metadata.name,
-                    "namespace": pod.metadata.namespace,
-                    "node": pod.spec.node_name,
-                }
-            )
-    return result
+
+    if namespace:
+        raw_pods = core_v1.list_namespaced_pod(namespace, watch=False)
+    else:
+        raw_pods = core_v1.list_pod_for_all_namespaces(watch=False)
+
+    return [
+        {
+            "name": pod.metadata.name,
+            "namespace": pod.metadata.namespace,
+            "node": pod.spec.node_name,
+        }
+        for pod in raw_pods.items
+        if pod.status.phase == "Running"
+    ]
 
 
 def get_images():
