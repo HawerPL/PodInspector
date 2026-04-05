@@ -1,0 +1,218 @@
+# These values configure the Grafana Mimir or Grafana Enterprise Metrics cluster
+# for higher scale than the default values, but not for high-availability production use.
+# The setup targets 70% CPU and memory utilization
+# so that the cluster has room to grow. The resource requests reflect 70% utilization
+# and the limits reflect 100% utilization. The values do not set CPU limits,
+# because CPU limits have caused severe issues elsewhere, so we don't apply any in our helm chart:
+# see https://engineering.indeedblog.com/blog/2019/12/unthrottled-fixing-cpu-limits-in-the-cloud/
+# If you require CPU limits for billing purposes see capped-small.yaml
+#
+# These values are suitable for ingestion of ~1M series and scrape interval of 15s.
+# This implies ingestion rate of around 66000 samples per second.
+#
+# Query requirements can vary dramatically depending on query rate and query
+# ranges. The values here satisfy a "usual" query load of around 5 queries per second
+# as seen from our production clusters at this scale.
+#
+# The values in this file also add podAntiAffinity rules for ingesters and store-gateways.
+# The rules ensure that the replicas of the same component are not scheduled on the same
+# Kubernetes Node. Zone-aware replication is enabled by default on new installation.
+# Refer to [Migrate from single zone to zone-aware replication with Helm](https://grafana.com/docs/mimir/latest/migration-guide/migrating-from-single-zone-with-helm) and
+# [Zone-Aware Replication](https://grafana.com/docs/mimir/latest/configure/configure-zone-aware-replication/)
+# for more information.
+#
+# MinIO is no longer enabled, and you are encouraged to use your cloud providers
+# object storage service such as S3 or GCS.
+
+alertmanager:
+  persistentVolume:
+    enabled: false
+  replicas: 1
+  resources:
+    # limits:
+      # memory: 1Gi
+    requests:
+      cpu: 20m
+      # memory: 256Mi
+  statefulSet:
+    enabled: true
+
+compactor:
+  persistentVolume:
+    enabled: true
+    size: 1Gi
+  resources:
+    # limits:
+    #   memory: 1Gi
+    requests:
+      cpu: 20m
+      # memory: 256Mi
+
+distributor:
+  replicas: 1
+  resources:
+    # limits:
+    #   memory: 1Gi
+    requests:
+      cpu: 20m
+      # memory: 256Mi
+
+ingester:
+  persistentVolume:
+    size: 1Gi
+  replicas: 2
+  resources:
+    # limits:
+      # memory: 1Gi
+    requests:
+      cpu: 20m
+      # memory: 256Mi
+  topologySpreadConstraints: {}
+  affinity: {}
+    # podAntiAffinity:
+    #   requiredDuringSchedulingIgnoredDuringExecution:
+    #     - labelSelector:
+    #         matchExpressions:
+    #           - key: app.kubernetes.io/component
+    #             operator: In
+    #             values:
+    #               - ingester
+    #       topologyKey: "kubernetes.io/hostname"
+
+  zoneAwareReplication:
+    enabled: false
+    topologyKey: "kubernetes.io/hostname"
+
+chunks-cache:
+  enabled: false
+  replicas: 3
+
+index-cache:
+  enabled: false
+  replicas: 3
+
+metadata-cache:
+  enabled: false
+  replicas: 3
+
+results-cache:
+  enabled: false
+  replicas: 3
+
+minio:
+  enabled: false
+
+overrides_exporter:
+  replicas: 1
+  resources:
+    # limits:
+    #   memory: 128Mi
+    requests:
+      cpu: 20m
+      # memory: 128Mi
+
+querier:
+  replicas: 1
+  resources:
+    # limits:
+      # memory: 1Gi
+    requests:
+      cpu: 20m
+      # memory: 256Mi
+
+query_frontend:
+  replicas: 1
+  resources:
+    # limits:
+      # memory: 2.8Gi
+    requests:
+      cpu: 20m
+      # memory: 256Mi
+
+query_scheduler:
+  enabled: true
+  replicas: 1
+  requests:
+    cpu: 20m
+
+ruler:
+  replicas: 1
+  resources:
+    # limits:
+      # memory: 1Gi
+    requests:
+      cpu: 20m
+      # memory: 256Mi
+
+store_gateway:
+  persistentVolume:
+    size: 1Gi
+  replicas: 1
+  resources:
+    # limits:
+    #   memory: 1Gi
+    requests:
+      cpu: 20m
+      #memory: 0.5Gi
+  topologySpreadConstraints: {}
+  affinity: {}
+    # podAntiAffinity:
+    #   requiredDuringSchedulingIgnoredDuringExecution:
+    #     - labelSelector:
+    #         matchExpressions:
+    #           - key: app.kubernetes.io/component
+    #             operator: In
+    #             values:
+    #               - store-gateway
+    #       topologyKey: "kubernetes.io/hostname"
+  zoneAwareReplication:
+    enabled: false
+    topologyKey: "kubernetes.io/hostname"
+
+gateway:
+  replicas: 1
+  resources:
+    limits:
+      memory: 731Mi
+    requests:
+      cpu: 1
+      memory: 256Mi
+    
+kafka:
+  # -- Enable Kafka for ingest-storage architecture
+  enabled: true
+  resources:
+    requests:
+      cpu: 20m
+      # memory: 1Gi
+    limits: {}
+  persistence:
+    # If false, use emptyDir
+    enabled: false
+    size: 1Gi
+    storageClassName: ""
+
+rollout_operator:
+  resources:
+    requests:
+      cpu: 20m
+
+mimir:
+  structuredConfig:
+    common:
+      storage:
+        backend: s3
+        s3:
+          endpoint: minio:9000
+          access_key_id: "lgtm"
+          secret_access_key: "supersecret"
+          insecure: true
+    blocks_storage:
+      s3:
+          bucket_name: mimir-blocks
+    alertmanager_storage:
+      s3:
+        bucket_name: mimir-alertmanager
+    ruler_storage:
+      s3:
+        bucket_name: mimir-ruler

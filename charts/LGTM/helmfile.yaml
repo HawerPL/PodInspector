@@ -1,0 +1,47 @@
+---
+repositories:
+  - name: grafana
+    url: https://grafana.github.io/helm-charts
+  - name: minio
+    url: https://charts.min.io/
+
+releases:
+  - name: minio
+    namespace: observability
+    chart: minio/minio
+    version: 5.4.0
+    values:
+      - values/common.yaml
+      - values/minio.yaml
+
+  - name: grafana
+    namespace: observability
+    chart: oci://ghcr.io/grafana-community/helm-charts/grafana
+    version: 11.3.7
+    values:
+      - values/grafana.yaml
+      - values/common.yaml
+
+  - name: tempo
+    namespace: observability
+    chart: oci://ghcr.io/grafana-community/helm-charts/tempo-distributed
+    version: 2.9.0
+    values:
+      - values/tempo.yaml
+      - values/common.yaml
+
+  - name: loki
+    namespace: observability
+    chart: oci://ghcr.io/grafana-community/helm-charts/loki
+    version: 9.4.0
+    values:
+      - values/loki.yaml
+      - values/minio.yaml
+
+  - name: mimir
+    namespace: observability
+    chart: grafana/mimir-distributed
+    version:  6.0.6
+    values:
+      - values/mimir.yaml
+      - values/minio.yaml

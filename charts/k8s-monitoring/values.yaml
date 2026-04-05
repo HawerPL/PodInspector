@@ -36,18 +36,18 @@ global:
 destinations:
   - name: ClusterLoki
     type: loki
-    url: http://lgtm-distributed-loki-gateway/loki/api/v1/push
+    url: http://loki-gateway.observability.svc/loki/api/v1/push
       #auth:
       #type: basic
       #username: "my-username"
       #password: "my-password"
-      #tenantIdFrom: env("LOKI_TENANT_ID")
+    tenantIdFrom: '"TEST_TENANT"' #env("LOKI_TENANT_ID")
   - name: ClusterMimir
     type: prometheus
-    url: http://lgtm-distributed-mimir-nginx/api/v1/push
+    url: http://mimir-gateway.observability.svc/api/v1/push
   - name: ClusterTempo
     type: otlp
-    url: http://lgtm-distributed-lgtm-distributed-tempo-distributor/api/v1/push
+    url: http://tempo-distributor.observability.svc:3200/api/v1/push
   # - name: ClusterPyroscope
   #   type: pyroscope
   #   url: http://lgtm-distributed-lgtm-distributed-tempo-distributor/api/v1/push

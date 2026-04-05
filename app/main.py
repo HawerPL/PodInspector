@@ -26,6 +26,22 @@ if settings.ENABLE_PROFILING and platform.system() != "Windows":
         gil_only=True,
     )
 
+if settings.ENABLE_TRACING:
+    from opentelemetry import trace
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor
+    from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+    from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+    from opentelemetry.instrumentation.logging import LoggingInstrumentor
+
+    trace.set_tracer_provider(TracerProvider())
+    tracer = trace.get_tracer(__name__)
+    otlp_exporter = OTLPSpanExporter(endpoint=settings.TRACING_ENDPOINT, insecure=True)
+    span_processor = BatchSpanProcessor(otlp_exporter)
+    trace.get_tracer_provider().add_span_processor(span_processor)
+
+    LoggingInstrumentor().instrument(set_logging_format=True)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -62,6 +78,7 @@ def create_app():
 
 
 app = create_app()
+FastAPIInstrumentor.instrument_app(app)
 Instrumentator().instrument(app).expose(app)
 
 
