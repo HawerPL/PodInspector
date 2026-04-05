@@ -41,7 +41,15 @@ releases:
   - name: mimir
     namespace: observability
     chart: grafana/mimir-distributed
-    version:  6.0.6
+    version: 6.0.6
     values:
       - values/mimir.yaml
+      - values/minio.yaml
+
+  - name: pyroscope
+    namespace: observability
+    chart: grafana/pyroscope
+    version: 1.19.2
+    values:
+      - values/pyroscope.yaml
       - values/minio.yaml

@@ -23,7 +23,9 @@ if settings.ENABLE_PROFILING and platform.system() != "Windows":
         server_address=settings.PROFILING_ENDPOINT,
         sample_rate=100,
         oncpu=True,
-        gil_only=True,
+        gil_only=False,
+        enable_logging=settings.ENABLE_PROFILING_DEBUG,
+        tags={"hostname": platform.node()},
     )
 
 if settings.ENABLE_TRACING:

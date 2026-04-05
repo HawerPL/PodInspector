@@ -706,7 +706,7 @@ datasources:
               datasourceUid: prom
         - name: Grafana Pyroscope
           type: grafana-pyroscope-datasource
-          url: http://k8s-monitoring-alloy-receiver:4040
+          url: http://pyroscope-headless:4040
           jsonData:
             minStep: '15s'
   #  - name: Prometheus

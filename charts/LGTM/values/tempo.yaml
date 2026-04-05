@@ -1341,12 +1341,12 @@ traces:
   otlp:
     http:
       # -- Enable Tempo to ingest Open Telemetry HTTP traces
-      enabled: false
+      enabled: true
       # -- HTTP receiver advanced config
       receiverConfig: {}
     grpc:
       # -- Enable Tempo to ingest Open Telemetry gRPC traces
-      enabled: false
+      enabled: true
       # -- gRPC receiver advanced config
       receiverConfig: {}
       # -- Default OTLP gRPC port
