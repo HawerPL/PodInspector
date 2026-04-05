@@ -78,7 +78,10 @@ def create_app():
 
 
 app = create_app()
-FastAPIInstrumentor.instrument_app(app)
+
+if settings.ENABLE_TRACING:
+    FastAPIInstrumentor.instrument_app(app)
+
 Instrumentator().instrument(app).expose(app)
 
 
