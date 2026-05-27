@@ -701,9 +701,9 @@ datasources:
             lokiSearch:
               datasourceUid: loki
             tracesToMetrics:
-              datasourceUid: prom
+              datasourceUid: mimir-ds
             serviceMap:
-              datasourceUid: prom
+              datasourceUid: mimir-ds
         - name: Grafana Pyroscope
           type: grafana-pyroscope-datasource
           url: http://pyroscope-headless:4040
@@ -728,12 +728,21 @@ datasources:
 ## Configure grafana alerting (can be templated)
 ## ref: https://docs.grafana.com/alerting/set-up/provision-alerting-resources/file-provisioning/
 ##
-alerting: {}
+alerting:
   # policies.yaml:
   #   apiVersion: 1
   #   policies:
   #     - orgId: 1
   #       receiver: first_uid
+  policies.yaml:
+    apiVersion: 1
+    policies:
+      - orgId: 1
+        receiver: n8n-webhook
+        group_by: ["alertname", "namespace", "pod"]
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 4h
   #
   # rules.yaml:
   #   apiVersion: 1
@@ -780,23 +789,312 @@ alerting: {}
   #           labels:
   #             team: sre_team_1
   #
-  # contactpoints.yaml:
-  #   secret:
-  #     apiVersion: 1
-  #     contactPoints:
-  #       - orgId: 1
-  #         name: cp_1
-  #         receivers:
-  #           - uid: first_uid
-  #             type: pagerduty
-  #             settings:
-  #               integrationKey: XXX
-  #               severity: critical
-  #               class: ping failure
-  #               component: Grafana
-  #               group: app-stack
-  #               summary: |
-  #                 {{ `{{ include "default.message" . }}` }}
+  rules.yaml:
+    apiVersion: 1
+    groups:
+      - orgId: 1
+        name: k8s-pod-alerts
+        folder: Infrastructure
+        interval: 1m
+        rules:
+
+          # Pod restartuje się w pętli
+          - uid: pod-crashloop
+            title: PodCrashLoopBackOff
+            condition: C
+            for: 2m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Pod {{`{{ $labels.pod }}`}} w CrashLoopBackOff"
+              description: "Namespace: {{`{{ $labels.namespace }}`}}, restartów w ciągu 15 min: {{`{{ $values.A.Value }}`}}"
+            data:
+              - refId: A
+                datasourceUid: prom
+                relativeTimeRange:
+                  from: 300
+                  to: 0
+                model:
+                  editorMode: code
+                  instant: true
+                  expr: |
+                    max by (pod) (
+                      increase(kube_pod_container_status_restarts_total{
+                        namespace="monitoring",
+                        pod=~"podinspector.*"
+                      }[15m])
+                    )
+                  refId: A
+
+              - refId: C
+                datasourceUid: "__expr__"
+                model:
+                  refId: C
+                  type: threshold
+                  expression: A
+                  conditions:
+                    - evaluator:
+                        type: gt
+                        params:
+                          - 1
+          # Pod nie jest gotowy
+          - uid: pod-not-ready
+            title: PodNotReady
+            condition: C
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Pod {{`{{ $labels.pod }}`}} nie jest gotowy"
+              description: "Namespace: {{`{{ $labels.namespace }}`}}, pod nie przeszedł readiness probe od ponad 5 minut"
+            data:
+              - refId: A
+                datasourceUid: prom
+                relativeTimeRange:
+                  from: 300
+                  to: 0
+                model:
+                  expr: |
+                    kube_pod_status_ready{
+                      namespace="monitoring",
+                      pod=~"podinspector.*",
+                      condition="true"
+                    } == 0
+                  refId: A
+              - refId: C
+                datasourceUid: "__expr__"
+                model:
+                  type: threshold
+                  refId: C
+                  expression: A
+                  conditions:
+                    - evaluator:
+                        type: gt
+                        params: [-1]
+                      query:
+                        params: [A]
+
+          # Pod w stanie OOMKilled (zabity przez brak pamięci)
+          - uid: pod-oomkilled
+            title: PodOOMKilled
+            condition: C
+            for: 0m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Pod {{`{{ $labels.pod }}`}} zabity przez OOMKiller"
+              description: "Namespace: {{`{{ $labels.namespace }}`}}, kontener {{`{{ $labels.container }}`}} przekroczył limit pamięci"
+            data:
+              - refId: A
+                datasourceUid: prom
+                relativeTimeRange:
+                  from: 300
+                  to: 0
+                model:
+                  expr: |
+                    kube_pod_container_status_last_terminated_reason{
+                      namespace="monitoring",
+                      pod=~"podinspector.*",
+                      reason="OOMKilled"
+                    } == 1
+                  refId: A
+              - refId: C
+                datasourceUid: "__expr__"
+                model:
+                  expression: A
+                  type: threshold
+                  refId: C
+                  conditions:
+                    - evaluator:
+                        type: gt
+                        params: [-1]
+                      query:
+                        params: [A]
+
+          # Pod w stanie Pending zbyt długo
+          - uid: pod-stuck-pending
+            title: PodStuckPending
+            condition: C
+            for: 10m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Pod {{`{{ $labels.pod }}`}} utknął w Pending"
+              description: "Namespace: {{`{{ $labels.namespace }}`}}, pod nie został zaschedulowany od ponad 10 minut — możliwy brak zasobów na nodach"
+            data:
+              - refId: A
+                datasourceUid: prom
+                relativeTimeRange:
+                  from: 300
+                  to: 0
+                model:
+                  expr: |
+                    kube_pod_status_phase{
+                      namespace="monitoring",
+                      pod=~"podinspector.*",
+                      phase="Pending"
+                    } == 1
+                  refId: A
+              - refId: C
+                datasourceUid: "__expr__"
+                model:
+                  type: threshold
+                  expression: A
+                  refId: C
+                  conditions:
+                    - evaluator:
+                        type: gt
+                        params: [-1]
+                      query:
+                        params: [A]
+
+          # Kontener przekracza 80% limitu CPU
+          # - uid: pod-cpu-throttling
+          #   title: PodCPUThrottling
+          #   condition: C
+          #   for: 15m
+          #   labels:
+          #     severity: warning
+          #   annotations:
+          #     summary: "Pod {{`{{ $labels.pod }}`}} throttlowany na CPU"
+          #     description: "Namespace: {{`{{ $labels.namespace }}`}}, ponad 80% czasu CPU jest throttlowane — rozważ zwiększenie limitu"
+          #   data:
+          #     - refId: A
+          #       datasourceUid: prom
+          #       relativeTimeRange:
+          #         from: 300
+          #         to: 0
+          #       model:
+          #         expr: |
+          #           rate(container_cpu_cfs_throttled_seconds_total{
+          #             namespace="monitoring",
+          #             pod=~"podinspector.*",
+          #             container!=""
+          #           }[5m])
+          #           /
+          #           rate(container_cpu_cfs_periods_total{
+          #             namespace="monitoring",
+          #             pod=~"podinspector.*",
+          #             container!=""
+          #           }[5m]) > 0.8
+          #         refId: A
+          #     - refId: C
+          #       datasourceUid: "__expr__"
+          #       model:
+          #         type: threshold
+          #         refId: C
+          #         conditions:
+          #           - evaluator:
+          #               type: gt
+          #               params: [-1]
+          #             query:
+          #               params: [A]
+
+          # Kontener przekracza 90% limitu pamięci
+          - uid: pod-memory-pressure
+            title: PodMemoryPressure
+            condition: C
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Pod {{`{{ $labels.pod }}`}} zbliża się do limitu pamięci"
+              description: "Namespace: {{`{{ $labels.namespace }}`}}, zużycie pamięci powyżej 90% limitu — ryzyko OOMKill"
+            data:
+              - refId: A
+                datasourceUid: prom
+                relativeTimeRange:
+                  from: 300
+                  to: 0
+                model:
+                  expr: |
+                    container_memory_working_set_bytes{
+                      namespace="monitoring",
+                      pod=~"podinspector.*",
+                      container!=""
+                    }
+                    /
+                    kube_pod_container_resource_limits{
+                      namespace="monitoring",
+                      pod=~"podinspector.*",
+                      resource="memory"
+                    } > 0.9
+                  refId: A
+              - refId: C
+                datasourceUid: "__expr__"
+                model:
+                  type: threshold
+                  refId: C
+                  expression: A
+                  conditions:
+                    - evaluator:
+                        type: gt
+                        params: [-1]
+                      query:
+                        params: [A]
+
+          # Pod zniknął — deployment nie ma żadnej gotowej repliki
+          # - uid: pod-missing
+          #   title: PodMissing
+          #   condition: C
+          #   for: 5m
+          #   labels:
+          #     severity: critical
+          #   annotations:
+          #     summary: "Brak gotowych replik dla podinspector"
+          #     description: "Namespace: {{`{{ $labels.namespace }}`}}, deployment nie ma żadnej gotowej repliki od ponad 5 minut"
+          #   data:
+          #     - refId: A
+          #       datasourceUid: prom
+          #       relativeTimeRange:
+          #         from: 300
+          #         to: 0
+          #       model:
+          #         expr: |
+          #           kube_deployment_status_replicas_ready{
+          #             namespace="monitoring",
+          #             deployment=~"podinspector.*"
+          #           } == 0
+          #         refId: A
+          #     - refId: C
+          #       datasourceUid: "__expr__"
+          #       model:
+          #         type: threshold
+          #         refId: C
+          #         conditions:
+          #           - evaluator:
+          #               type: gt
+          #               params: [-1]
+          #             query:
+          #               params: [A]
+      # contactpoints.yaml:
+      #   secret:
+      #     apiVersion: 1
+      #     contactPoints:
+      #       - orgId: 1
+      #         name: cp_1
+      #         receivers:
+      #           - uid: first_uid
+      #             type: pagerduty
+      #             settings:
+      #               integrationKey: XXX
+      #               severity: critical
+      #               class: ping failure
+      #               component: Grafana
+      #               group: app-stack
+      #               summary: |
+      #                 {{ `{{ include "default.message" . }}` }}
+  contactpoints.yaml:
+    apiVersion: 1
+    contactPoints:
+      - orgId: 1
+        name: n8n-webhook
+        receivers:
+          - uid: n8n-webhook-uid
+            type: webhook
+            settings:
+              url: http://n8n.n8n.svc:5678/webhook/k8s-alert
+              httpMethod: POST
   #
   # templates.yaml:
   #   apiVersion: 1
