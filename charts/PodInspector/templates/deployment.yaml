@@ -13,17 +13,17 @@ spec:
       labels:
         app.kubernetes.io/name: pod-inspector
         app.kubernetes.io/instance: pod-inspector-{{ .Values.environment | default "production" }}
-      {{- with .Values.podLabels }}
-      {{- range $key, $value := . }}
-      {{ $key }}: {{ tpl $value $ | quote }}
-      {{- end }}
-      {{- end }}
-      annotations:
-      {{- with .Values.podAnnotations }}
-      {{- range $key, $value := . }}
+        {{- with .Values.podLabels }}
+        {{- range $key, $value := . }}
         {{ $key }}: {{ tpl $value $ | quote }}
-      {{- end }}
-      {{- end }}
+        {{- end }}
+        {{- end }}
+      annotations:
+        {{- with .Values.podAnnotations }}
+        {{- range $key, $value := . }}
+          {{ $key }}: {{ tpl $value $ | quote }}
+        {{- end }}
+        {{- end }}
     spec:
       containers:
         - name: podinspector
