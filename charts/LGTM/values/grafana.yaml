@@ -803,6 +803,8 @@ alerting:
             title: PodCrashLoopBackOff
             condition: C
             for: 2m
+            noDataState: OK
+            execErrState: OK
             labels:
               severity: critical
             annotations:
@@ -818,12 +820,17 @@ alerting:
                   editorMode: code
                   instant: true
                   expr: |
-                    max by (pod) (
+                    max by (pod, namespace) (
                       increase(kube_pod_container_status_restarts_total{
                         namespace="monitoring",
                         pod=~"podinspector.*"
                       }[15m])
                     )
+                    * on(pod, namespace) group_left(label_hawerpl_client, label_hawerpl_environment)
+                    kube_pod_labels{
+                      namespace="monitoring",
+                      pod=~"podinspector.*"
+                    }
                   refId: A
 
               - refId: C
@@ -842,6 +849,8 @@ alerting:
             title: PodNotReady
             condition: C
             for: 5m
+            noDataState: OK
+            execErrState: OK
             labels:
               severity: critical
             annotations:
@@ -879,6 +888,8 @@ alerting:
             title: PodOOMKilled
             condition: C
             for: 0m
+            noDataState: OK
+            execErrState: OK
             labels:
               severity: critical
             annotations:
@@ -916,6 +927,8 @@ alerting:
             title: PodStuckPending
             condition: C
             for: 10m
+            noDataState: OK
+            execErrState: OK
             labels:
               severity: warning
             annotations:
@@ -995,6 +1008,8 @@ alerting:
             title: PodMemoryPressure
             condition: C
             for: 5m
+            noDataState: OK
+            execErrState: OK
             labels:
               severity: warning
             annotations:
@@ -1093,7 +1108,7 @@ alerting:
           - uid: n8n-webhook-uid
             type: webhook
             settings:
-              url: http://n8n.n8n.svc:5678/webhook/k8s-alert
+              url: http://n8n.localhost:8881/webhook-test/k8s-alert
               httpMethod: POST
   #
   # templates.yaml:

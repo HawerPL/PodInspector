@@ -61,6 +61,14 @@ destinations:
 # @default -- Disabled
 # @section -- Features - Cluster Metrics
 clusterMetrics:
+  kube-state-metrics:
+    metricLabelsAllowlist:
+    - nodes=[agentpool,alpha.eksctl.io/cluster-name,alpha.eksctl.io/nodegroup-name,beta.kubernetes.io/instance-type,cloud.google.com/gke-nodepool,cluster-name,ec2.amazonaws.com/Name,ec2.amazonaws.com/aws-autoscaling-groupName,ec2.amazonaws.com/aws-autoscaling-group-name,ec2.amazonaws.com/name,eks.amazonaws.com/nodegroup,k8s.io/cloud-provider-aws,karpenter.sh/nodepool,kubernetes.azure.com/cluster,kubernetes.io/arch,kubernetes.io/hostname,kubernetes.io/os,node.kubernetes.io/instance-type,topology.kubernetes.io/region,topology.kubernetes.io/zone]
+    - pods=[hawerpl/environment,hawerpl/client,app.kubernetes.io/instance,app.kubernetes.io/name]
+    metricsTuning:
+      excludeMetrics: []
+      includeMetrics: 
+        - kube_pod_labels
   # -- Enable gathering Kubernetes Cluster metrics.
   # @section -- Features - Cluster Metrics
   enabled: true
